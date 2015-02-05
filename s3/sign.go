@@ -37,6 +37,7 @@ var s3ParamsToSign = map[string]bool{
 	"response-content-encoding":    true,
 	"website":                      true,
 	"delete":                       true,
+	"restore":                      true,
 }
 
 func sign(auth aws.Auth, method, canonicalPath string, params, headers map[string][]string) {

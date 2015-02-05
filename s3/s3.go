@@ -852,6 +852,35 @@ func (b *Bucket) PostFormArgs(path string, expires time.Time, redirect string) (
 	return
 }
 
+// RestoreObject requests an object be returned from Glacier to active S3
+func (b *Bucket) RestoreObject(path string) error {
+
+	body := `<RestoreRequest xmlns="http://s3.amazonaws.com/doc/2006-3-01"> <Days>2</Days> </RestoreRequest>`
+
+	digest := md5.New()
+	size, err := digest.Write([]byte(body))
+	if err != nil {
+		return fmt.Errorf("Content-MD5 header: %v", err)
+	}
+	headers := map[string][]string{
+		"Content-Length": {strconv.FormatInt(int64(size), 10)},
+		"Content-MD5":    {base64.StdEncoding.EncodeToString(digest.Sum(nil))},
+		"Content-Type":   {"text/xml"},
+	}
+
+	r := strings.NewReader(body)
+
+	req := &request{
+		method:  "POST",
+		bucket:  b.Name,
+		path:    path,
+		params:  url.Values{"restore": {""}},
+		headers: headers,
+		payload: r,
+	}
+	return b.S3.query(req, nil)
+}
+
 type request struct {
 	method   string
 	bucket   string
