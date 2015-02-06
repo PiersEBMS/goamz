@@ -105,8 +105,9 @@ type Options struct {
 
 type CopyOptions struct {
 	Options
-	MetadataDirective string
-	ContentType       string
+	MetadataDirective     string
+	ContentType           string
+	CopySourceIfNoneMatch string
 }
 
 // CopyObjectResult is the output from a Copy request
@@ -435,6 +436,9 @@ func (o CopyOptions) addHeaders(headers map[string][]string) {
 	o.Options.addHeaders(headers)
 	if len(o.MetadataDirective) != 0 {
 		headers["x-amz-metadata-directive"] = []string{o.MetadataDirective}
+	}
+	if len(o.CopySourceIfNoneMatch) != 0 {
+		headers["x-amz-copy-source-if-none-match"] = []string{o.CopySourceIfNoneMatch}
 	}
 	if len(o.ContentType) != 0 {
 		headers["Content-Type"] = []string{o.ContentType}
