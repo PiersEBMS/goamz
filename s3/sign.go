@@ -63,9 +63,7 @@ func (l keySortableTupleList) Less(i, j int) bool {
 }
 
 func (l keySortableTupleList) Swap(i, j int) {
-	temp := l[j]
-	l[j] = l[i]
-	l[i] = temp
+	l[i], l[j] = l[j], l[i]
 }
 
 func sign(auth aws.Auth, method, canonicalPath string, params, headers map[string][]string) {
