@@ -18,7 +18,6 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
-	"github.com/goamz/goamz/aws"
 	"io"
 	"io/ioutil"
 	"log"
@@ -29,6 +28,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/goamz/goamz/aws"
 )
 
 const debug = false
@@ -977,7 +978,11 @@ func (s3 *S3) run(req *request, resp interface{}) (*http.Response, error) {
 		delete(req.headers, "Content-Length")
 	}
 	if req.payload != nil {
-		hreq.Body = ioutil.NopCloser(req.payload)
+		if rc, ok := req.payload.(io.ReadCloser); ok {
+			hreq.Body = rc
+		} else {
+			hreq.Body = ioutil.NopCloser(req.payload)
+		}
 	}
 
 	if s3.client == nil {
